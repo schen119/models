@@ -58,6 +58,8 @@ from object_detection.utils import label_map_util
 tf.logging.set_verbosity(tf.logging.INFO)
 
 flags = tf.app.flags
+#reference from https://github.com/tensorflow/models/issues/1854
+flags.DEFINE_string('gpudev','0','Select a GPU Device.')
 flags.DEFINE_boolean('eval_training_data', False,
                      'If training data should be evaluated for this job.')
 flags.DEFINE_string('checkpoint_dir', '',
@@ -79,10 +81,12 @@ flags.DEFINE_boolean('run_once', False, 'Option to only run a single pass of '
                      'provided config.')
 FLAGS = flags.FLAGS
 
-
 def main(unused_argv):
   assert FLAGS.checkpoint_dir, '`checkpoint_dir` is missing.'
   assert FLAGS.eval_dir, '`eval_dir` is missing.'
+
+  os.environ["CUDA_VISIBLE_DEVICES"] = FLAGS.gpudev
+
   tf.gfile.MakeDirs(FLAGS.eval_dir)
   if FLAGS.pipeline_config_path:
     configs = config_util.get_configs_from_pipeline_file(
@@ -132,4 +136,4 @@ def main(unused_argv):
 
 
 if __name__ == '__main__':
-  tf.app.run()
+    tf.app.run()
